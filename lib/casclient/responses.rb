@@ -51,6 +51,8 @@ module CASClient
       
       # if we got this far then we've got a valid XML response, so we're doing CAS 2.0
       @protocol = 2.0
+
+      @authentication_result = @xml.name
       
       if is_success?
         cas_user = @xml.elements["cas:user"]
@@ -91,12 +93,30 @@ module CASClient
     end
     
     def is_success?
-      (instance_variable_defined?(:@valid) &&  @valid) || (protocol > 1.0 && xml.name == "authenticationSuccess")
+      (instance_variable_defined?(:@valid) &&  @valid) || (protocol > 1.0 && @authentication_result == "authenticationSuccess")
     end
     
     def is_failure?
-      (instance_variable_defined?(:@valid) && !@valid) || (protocol > 1.0 && xml.name == "authenticationFailure" )
+      (instance_variable_defined?(:@valid) && !@valid) || (protocol > 1.0 && @authentication_result == "authenticationFailure" )
     end
+
+    def marshal_dump
+      props = %w(@authentication_result @protocol @user @pgt_iou @proxies @extra_attributes @parse_datetime @failure_code @failure_message)
+      data = {}
+      props.each do |p|
+        data[p] = instance_variable_get(p)
+      end
+
+      return data
+    end
+
+    def marshal_load(data)
+      props = %w(@authentication_result @protocol @user @pgt_iou @proxies @extra_attributes @parse_datetime @failure_code @failure_message)
+      props.each do |p|
+        instance_variable_set(p, data[p])
+      end
+    end
+
   end
   
   # Represents a response from the CAS server to a proxy ticket request 
