@@ -358,7 +358,7 @@ module CASClient
               return config[:service_url]
             end
 
-            return controller.env['REQUEST_URI'].gsub(/\?ticket=[^&]*&?/, '?').gsub(/&?ticket=[^&]*/, '')
+            return controller.request.url.gsub(/\?ticket=[^&]*&?/, '?').gsub(/&?ticket=[^&]*/, '')
             
             # FIXME Not sure why this complicated way of generating (an often incorrect) URL is needed. So I just used the above line to replace it all
             # params = controller.params.dup
