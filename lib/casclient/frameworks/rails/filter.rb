@@ -357,12 +357,15 @@ module CASClient
               log.debug("Using explicitly set service url: #{config[:service_url]}")
               return config[:service_url]
             end
+
+            return controller.request.url.gsub(/\?ticket=[^&]*&?/, '?').gsub(/&?ticket=[^&]*/, '')
             
-            params = controller.params.dup
-            params.delete(:ticket)
-            service_url = controller.url_for(params).gsub(/%2F/, '/') 
-            log.debug("Guessed service url: #{service_url.inspect}")
-            return service_url
+            # FIXME Not sure why this complicated way of generating (an often incorrect) URL is needed. So I just used the above line to replace it all
+            # params = controller.params.dup
+            # params.delete(:ticket)
+            # service_url = controller.url_for(params).gsub(/%2F/, '/') 
+            # log.debug("Guessed service url: #{service_url.inspect}")
+            # return service_url
           end
           
           # Creates a file in tmp/sessions linking a SessionTicket
