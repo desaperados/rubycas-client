@@ -67,9 +67,19 @@ module CASClient
                 if is_new_session
                   log.info("Ticket #{st.ticket.inspect} for service #{st.service.inspect} belonging to user #{vr.user.inspect} is VALID.")
                   controller.session[client.username_session_key] = vr.user.dup
-                  controller.session[client.extra_attributes_session_key] = HashWithIndifferentAccess.new(vr.extra_attributes) if vr.extra_attributes
 
+                  # Added for trifecta, convert cached_permissions (a tadmin user column with canonical user.roles and user.groups.roles)
+                  # to roles so that flex application does not need to be altered
                   if vr.extra_attributes
+                    if vr.extra_attributes["cached_permissions"]
+                      if vr.extra_attributes["cached_permissions"].present?
+                        vr.extra_attributes["roles"] = vr.extra_attributes["cached_permissions"]
+                      else
+                        vr.extra_attributes["roles"] = nil
+                      end
+                      vr.extra_attributes.delete("cached_permissions")
+                    end
+                    controller.session[client.extra_attributes_session_key] = HashWithIndifferentAccess.new(vr.extra_attributes)
                     log.debug("Extra user attributes provided along with ticket #{st.ticket.inspect}: #{vr.extra_attributes.inspect}.")
                   end
 
