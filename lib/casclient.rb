@@ -67,6 +67,8 @@ require 'casclient/tickets'
 require 'casclient/responses'
 require 'casclient/client'
 require 'casclient/version'
+require 'casclient/frameworks/rails/filter'
+
 
 # Detect legacy configuration and show appropriate error message
 module CAS
